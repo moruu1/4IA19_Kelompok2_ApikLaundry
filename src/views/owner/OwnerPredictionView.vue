@@ -521,13 +521,13 @@ async function fetchPredictions() {
   
   try {
     // Fetch predictions
-    const predictionResponse = await fetch(`${ML_API_URL}/api/predict?days=${predictionDays.value}`)
+    const predictionResponse = await fetch(`${ML_API_URL}/predict?days=${predictionDays.value}`)
     if (!predictionResponse.ok) throw new Error('Gagal mengambil data prediksi')
     
     predictionData.value = await predictionResponse.json()
     
     // Fetch historical data
-    const historicalResponse = await fetch(`${ML_API_URL}/api/historical`)
+    const historicalResponse = await fetch(`${ML_API_URL}/historical`)
     if (!historicalResponse.ok) throw new Error('Gagal mengambil data historis')
     
     const historicalResult = await historicalResponse.json()
@@ -590,7 +590,7 @@ async function fetchInventoryPrediction() {
   inventoryError.value = null
   
   try {
-    const response = await fetch(`${ML_API_URL}/api/inventory-prediction`)
+    const response = await fetch(`${ML_API_URL}/inventory-prediction`)
     if (!response.ok) throw new Error('Gagal mengambil data prediksi inventaris')
     
     const result = await response.json()
