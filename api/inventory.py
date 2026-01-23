@@ -140,6 +140,7 @@ class InventoryPredictor:
             return final_results
 
         except Exception as error:
+            # Force fresh deploy
             import traceback
             error_trace = traceback.format_exc()
             print(f"❌ Inventory Prediction Error: {error}\n{error_trace}")

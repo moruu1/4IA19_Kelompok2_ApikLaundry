@@ -144,8 +144,9 @@ class InventoryPredictor:
             return final_results
 
         except Exception as error:
+            # Force fresh deploy
             print(f"❌ Error Inventory: {error}")
-            return {"error": str(error)}
+            return {"error": f"Inventory failed: {str(error)}"}
 
 # --- BLOCK TEST MANUAL (Bisa dijalankan langsung di terminal) ---
 if __name__ == "__main__":

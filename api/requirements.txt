@@ -4,3 +4,4 @@ flask==3.0.0
 flask-cors==4.0.0
 websockets==13.1
 groq
+pandas==2.0.0
