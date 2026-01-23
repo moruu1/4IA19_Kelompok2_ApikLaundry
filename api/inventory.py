@@ -13,7 +13,7 @@ supabase: Client = create_client(URL, KEY)
 
 class InventoryPredictor:
     def get_prediction(self):
-        print("📦 Memulai Prediksi Stok Inventaris (Moving Average)...")
+        """Generate inventory stock predictions based on usage patterns"""
         
         try:
             # --- TAHAP 1: AMBIL DATA TRANSAKSI ---
@@ -40,8 +40,6 @@ class InventoryPredictor:
             avg_load_per_service = df_daily.groupby('service_id')['jumlah_unit'].mean().reset_index()
             avg_load_per_service.columns = ['service_id', 'avg_daily_qty']
             
-            print(f"✅ Analisis beban kerja harian selesai. Service terdeteksi: {len(avg_load_per_service)}")
-
             # --- TAHAP 3: AMBIL DATA BOM & INVENTORY ---
             # Join Tabel: service_bom -> inventory_items
             # Kita ambil resep untuk tahu Service A butuh Bahan B berapa banyak
@@ -139,12 +137,13 @@ class InventoryPredictor:
                     "status": status
                 })
             
-            print("✅ Prediksi selesai.")
             return final_results
 
         except Exception as e:
-            print(f"❌ Error Inventory: {e}")
-            return {"error": str(e)}
+            import traceback
+            error_trace = traceback.format_exc()
+            print(f"❌ Inventory Prediction Error: {e}\n{error_trace}")
+            return {"error": f"Inventory prediction failed: {str(e)}"}
 
 # --- BLOCK TEST MANUAL (Bisa dijalankan langsung di terminal) ---
 if __name__ == "__main__":

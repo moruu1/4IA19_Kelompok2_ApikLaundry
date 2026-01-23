@@ -87,26 +87,60 @@ class handler(BaseHTTPRequestHandler):
             # Parse query parameters
             parsed = urlparse(self.path)
             query_params = parse_qs(parsed.query)
-            days = int(query_params.get('days', ['30'])[0])
+            
+            # Validate 'days' parameter (1-365 range)
+            try:
+                days = int(query_params.get('days', ['30'])[0])
+                if days < 1 or days > 365:
+                    raise ValueError("Days must be between 1 and 365")
+            except ValueError as e:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                error_response = {
+                    'success': False,
+                    'error': f'Invalid days parameter: {str(e)}'
+                }
+                self.wfile.write(json.dumps(error_response).encode())
+                return
             
             # Get predictions
             result = train_and_predict(days)
             
+            # Determine status code based on result
+            status_code = 200 if result.get('success') else 500
+            
             # Send response
-            self.send_response(200)
+            self.send_response(status_code)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Cache-Control', 'public, max-age=300')  # Cache for 5 minutes
             self.end_headers()
             
             self.wfile.write(json.dumps(result).encode())
             
         except Exception as e:
+            print(f"Error in predict endpoint: {e}")
+            import traceback
+            traceback.print_exc()
+            
             self.send_response(500)
             self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             
             error_response = {
                 'success': False,
-                'error': str(e)
+                'error': f'Server error: {str(e)}'
             }
             self.wfile.write(json.dumps(error_response).encode())
+    
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()

@@ -1,12 +1,34 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
+      "source": "/api/health",
+      "destination": "/api/health.py"
+    },
+    {
+      "source": "/api/predict",
+      "destination": "/api/predict.py"
+    },
+    {
+      "source": "/api/historical",
+      "destination": "/api/historical.py"
+    },
+    {
+      "source": "/api/inventory-prediction",
+      "destination": "/api/inventory-prediction.py"
+    },
+    {
+      "source": "/api/chat",
       "destination": "/api/index.py"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/*.py": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }

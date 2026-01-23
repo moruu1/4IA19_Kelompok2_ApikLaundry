@@ -129,15 +129,6 @@ class RevenuePredictionModel:
         ss_res = sum(e*e for e in errors)
         r2 = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
         
-        print("\n" + "="*50)
-        print("Model Training Results (Pure Python):")
-        print(f"Slope (Daily Trend): Rp {self.model.slope:,.2f}/day")
-        print(f"Mean Absolute Error: Rp {mae:,.0f}")
-        print(f"Root Mean Squared Error: Rp {rmse:,.0f}")
-        print(f"R² Score: {r2:.4f}")
-        print(f"MAPE: {mape:.2f}%")
-        print("="*50)
-        
         return {
             'mae': mae,
             'rmse': rmse,

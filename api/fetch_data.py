@@ -40,10 +40,6 @@ def fetch_financial_data():
         # Sort by date
         data.sort(key=lambda x: x['tanggal_obj'])
         
-        print(f"Fetched {len(data)} records from Supabase")
-        if data:
-            print(f"Date range: {data[0]['tanggal_obj']} to {data[-1]['tanggal_obj']}")
-        
         return data
     
     except Exception as e:
@@ -84,13 +80,6 @@ def get_revenue_data():
         })
     
     result.sort(key=lambda x: x['date'])
-    
-    total_revenue = sum(item['revenue'] for item in result)
-    avg_revenue = total_revenue / len(result) if result else 0
-    
-    print(f"\nRevenue data prepared: {len(result)} days")
-    print(f"Total revenue: Rp {total_revenue:,.0f}")
-    print(f"Average daily revenue: Rp {avg_revenue:,.0f}")
     
     return result
 

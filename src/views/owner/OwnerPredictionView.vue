@@ -514,34 +514,87 @@ function renderChart() {
   })
 }
 
-// Fetch Predictions from ML API
-async function fetchPredictions() {
+// Fetch Predictions from ML API with retry logic
+async function fetchPredictions(retryCount = 0) {
+  const MAX_RETRIES = 3
+  const RETRY_DELAY = 1000 * Math.pow(2, retryCount) // Exponential backoff
+  
   loadingPrediction.value = true
   predictionError.value = null
   
   try {
-    // Fetch predictions
-    const predictionResponse = await fetch(`${ML_API_URL}/predict?days=${predictionDays.value}`)
-    if (!predictionResponse.ok) throw new Error('Gagal mengambil data prediksi')
+    // Fetch predictions with timeout
+    const predictionController = new AbortController()
+    const predictionTimeout = setTimeout(() => predictionController.abort(), 10000) // 10s timeout
     
-    predictionData.value = await predictionResponse.json()
+    const predictionResponse = await fetch(
+      `${ML_API_URL}/predict?days=${predictionDays.value}`,
+      { signal: predictionController.signal }
+    )
+    clearTimeout(predictionTimeout)
     
-    // Fetch historical data
-    const historicalResponse = await fetch(`${ML_API_URL}/historical`)
-    if (!historicalResponse.ok) throw new Error('Gagal mengambil data historis')
+    if (!predictionResponse.ok) {
+      const errorData = await predictionResponse.json().catch(() => ({}))
+      throw new Error(errorData.error || 'Gagal mengambil data prediksi')
+    }
+    
+    const predictionResult = await predictionResponse.json()
+    
+    if (!predictionResult.success) {
+      throw new Error(predictionResult.error || 'Prediksi gagal diproses')
+    }
+    
+    predictionData.value = predictionResult
+    
+    // Fetch historical data with timeout
+    const historicalController = new AbortController()
+    const historicalTimeout = setTimeout(() => historicalController.abort(), 10000)
+    
+    const historicalResponse = await fetch(
+      `${ML_API_URL}/historical`,
+      { signal: historicalController.signal }
+    )
+    clearTimeout(historicalTimeout)
+    
+    if (!historicalResponse.ok) {
+      const errorData = await historicalResponse.json().catch(() => ({}))
+      throw new Error(errorData.error || 'Gagal mengambil data historis')
+    }
     
     const historicalResult = await historicalResponse.json()
     
-    // Extract data from response - backend returns {success: true, data: [...]}
-    if (historicalResult.success && historicalResult.data) {
-      historicalData.value = { data: historicalResult.data }
-    } else {
-      throw new Error('Data historis tidak tersedia')
+    // Validate response structure
+    if (!historicalResult.success || !historicalResult.data || !Array.isArray(historicalResult.data)) {
+      throw new Error(historicalResult.error || 'Data historis tidak valid')
     }
+    
+    if (historicalResult.data.length === 0) {
+      throw new Error('Tidak ada data historis yang tersedia. Silakan tambahkan data transaksi terlebih dahulu.')
+    }
+    
+    historicalData.value = { data: historicalResult.data }
     
   } catch (error) {
     console.error('Error fetching predictions:', error)
-    predictionError.value = error.message || `Tidak dapat terhubung ke server prediksi. Silakan coba lagi.`
+    
+    // Handle specific error types
+    if (error.name === 'AbortError') {
+      predictionError.value = 'Request timeout. Server membutuhkan waktu terlalu lama untuk merespons.'
+    } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      predictionError.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'
+    } else {
+      predictionError.value = error.message || 'Terjadi kesalahan saat memuat data prediksi.'
+    }
+    
+    // Retry logic with exponential backoff
+    if (retryCount < MAX_RETRIES && !error.name === 'AbortError') {
+      console.log(`Retrying... (${retryCount + 1}/${MAX_RETRIES})`)
+      setTimeout(() => {
+        fetchPredictions(retryCount + 1)
+      }, RETRY_DELAY)
+      return
+    }
+    
   } finally {
     loadingPrediction.value = false
     
@@ -584,26 +637,64 @@ onMounted(() => {
   fetchInventoryPrediction()
 })
 
-// Fetch Inventory Prediction from ML API
-async function fetchInventoryPrediction() {
+// Fetch Inventory Prediction from ML API with retry logic
+async function fetchInventoryPrediction(retryCount = 0) {
+  const MAX_RETRIES = 3
+  const RETRY_DELAY = 1000 * Math.pow(2, retryCount)
+  
   loadingInventory.value = true
   inventoryError.value = null
   
   try {
-    const response = await fetch(`${ML_API_URL}/inventory-prediction`)
-    if (!response.ok) throw new Error('Gagal mengambil data prediksi inventaris')
+    // Add timeout to request
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10000) // 10s timeout
+    
+    const response = await fetch(
+      `${ML_API_URL}/inventory-prediction`,
+      { signal: controller.signal }
+    )
+    clearTimeout(timeout)
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.error || 'Gagal mengambil data prediksi inventaris')
+    }
     
     const result = await response.json()
     
-    if (result.success) {
-      inventoryPrediction.value = result.predictions || []
-    } else {
+    // Validate response
+    if (!result.success) {
       throw new Error(result.error || 'Gagal memuat prediksi inventaris')
     }
     
+    if (!Array.isArray(result.predictions)) {
+      throw new Error('Format data prediksi inventaris tidak valid')
+    }
+    
+    inventoryPrediction.value = result.predictions
+    
   } catch (error) {
     console.error('Error fetching inventory prediction:', error)
-    inventoryError.value = error.message || `Tidak dapat terhubung ke server prediksi. Silakan coba lagi.`
+    
+    // Handle specific error types
+    if (error.name === 'AbortError') {
+      inventoryError.value = 'Request timeout. Server membutuhkan waktu terlalu lama untuk merespons.'
+    } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      inventoryError.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'
+    } else {
+      inventoryError.value = error.message || 'Terjadi kesalahan saat memuat prediksi inventaris.'
+    }
+    
+    // Retry logic
+    if (retryCount < MAX_RETRIES && error.name !== 'AbortError') {
+      console.log(`Retrying inventory... (${retryCount + 1}/${MAX_RETRIES})`)
+      setTimeout(() => {
+        fetchInventoryPrediction(retryCount + 1)
+      }, RETRY_DELAY)
+      return
+    }
+    
   } finally {
     loadingInventory.value = false
   }
