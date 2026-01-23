@@ -11,27 +11,28 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 try:
     from flask import Flask
     from flask_cors import CORS
-    from model import RevenuePredictionModel
+    from seasonal_model import SeasonalRevenueModel
     from fetch_data import get_revenue_data
     
     app = Flask(__name__)
     CORS(app)
     
     def train_and_predict(days=30):
-        """Train model and get predictions"""
-        df = get_revenue_data() # This now returns list of dicts
+        """Train model and get predictions using Seasonal Model"""
+        df = get_revenue_data() # Returns list of dicts
         
         if df is None or len(df) < 5:
             raise Exception('Insufficient data for training')
         
-        model = RevenuePredictionModel()
+        # Initialize and train Seasonal Model
+        model = SeasonalRevenueModel()
         metrics = model.train(df)
         
-        # model.predict_future returns dict with 'predictions' list
+        # Get future predictions
         future_result = model.predict_future(days=days)
         predictions_list = future_result['predictions']
         
-        # model.get_fitted_values returns list of dicts
+        # Get fitted values (historical simulation)
         fitted_list = model.get_fitted_values()
         
         mae = float(metrics['mae'])
@@ -39,7 +40,7 @@ try:
         # Format predictions (add upper/lower bound)
         formatted_predictions = []
         for pred in predictions_list:
-            # pred['date'] is already isoformat string from model.predict_future
+            # pred['date'] is already isoformat string
             val = float(pred['predicted_revenue'])
             formatted_predictions.append({
                 'date': pred['date'],
@@ -70,8 +71,9 @@ try:
                 'trained_with_data_size': len(df),
                 'mae': float(metrics['mae']),
                 'rmse': float(metrics['rmse']),
-                'r2': float(metrics['r2']),
-                'mape': float(metrics['mape'])
+                'r2': 0, # Not applicable for this custom model
+                'mape': float(metrics['mape']),
+                'algorithm': 'Seasonal Adaptive (DSMA)'
             }
         }
         
