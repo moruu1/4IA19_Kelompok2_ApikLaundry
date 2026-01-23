@@ -1,0 +1,50 @@
+=== CURRENT FAQ DATABASE ===
+
+Total items: 9
+================================================================================
+
+1. PERTANYAAN: Apakah bisa antar jemput laundry?
+   JAWABAN: Tentu! Kami menyediakan layanan antar jemput gratis apabila laundry Anda diatas 5kg.
+
+--------------------------------------------------------------------------------
+
+2. PERTANYAAN: Jam berapa laundry buka operasional?
+   JAWABAN: Kami buka Weekday (Senin-Jumat) jam 08.00-20.00 dan Weekend (Sabtu-Minggu) jam 08.00-17.00.
+
+--------------------------------------------------------------------------------
+
+3. PERTANYAAN: Dimana alamat lokasi laundry ini?
+   JAWABAN: Alamat kami di Jl. Sasak Raya No. 47 Blok Rawa RT.004 RW. 008, Kelurahan Limo, Kecamatan Limo, Kota Depok.
+
+--------------------------------------------------------------------------------
+
+4. PERTANYAAN: Metode pembayaran apa saja yang diterima?
+   JAWABAN: Kami menerima pembayaran Tunai dan Transfer Bank.
+
+--------------------------------------------------------------------------------
+
+5. PERTANYAAN: Bagaimana cara komplain keluhan?
+   JAWABAN: Silakan hubungi admin via WhatsApp di 0816-1709-8435.
+
+--------------------------------------------------------------------------------
+
+6. PERTANYAAN: Apakah ada garansi cuci?
+   JAWABAN: Ya, kami bergaransi cuci ulang gratis 1x24 jam jika pakaian masih kotor atau bau setelah dicuci.
+
+--------------------------------------------------------------------------------
+
+7. PERTANYAAN: Apakah tersedia paket langganan member?
+   JAWABAN: Ya, kami memiliki paket langganan dengan Harga Rp 350.000 untuk kuota 50kg.
+
+--------------------------------------------------------------------------------
+
+8. PERTANYAAN: Berapa lama proses cucinya durasi?
+   JAWABAN: Untuk layanan Reguler 2 hari. Layanan Express 1 hari. Layanan Instan bisa selesai dalam 6 jam.
+
+--------------------------------------------------------------------------------
+
+9. PERTANYAAN: Berapa harga tarif biaya cuci laundry kiloan?
+   JAWABAN: Harga Cuci Kering Lipat adalah Rp 6.000/kg, sedangkan Cuci Komplit (Gosok) adalah Rp 10.000/kg.
+
+--------------------------------------------------------------------------------
+

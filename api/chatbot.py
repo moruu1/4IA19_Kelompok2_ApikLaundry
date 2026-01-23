@@ -70,9 +70,9 @@ class LaundryChatbot:
                         "content": user_input,
                     }
                 ],
-                model="llama3-8b-8192",
+                model="llama-3.1-8b-instant",  # Updated to production model
                 temperature=0.5,
-                max_tokens=300,
+                max_tokens=500,  # Increased for more detailed responses
             )
 
             return chat_completion.choices[0].message.content
