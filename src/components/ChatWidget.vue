@@ -3,7 +3,7 @@ import { ref, nextTick, onMounted } from 'vue'
 
 const emit = defineEmits(['close'])
 
-const ML_API_URL = import.meta.env.VITE_ML_API_URL || 'http://localhost:5000'
+const ML_API_URL = import.meta.env.VITE_ML_API_URL || '/api'
 
 const currentTime = ref('')
 const isLoading = ref(false)
@@ -67,7 +67,7 @@ async function sendMessage() {
   
   try {
     // Call backend chatbot API
-    const response = await fetch(`${ML_API_URL}/chatbot`, {
+    const response = await fetch(`${ML_API_URL}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -77,13 +77,18 @@ async function sendMessage() {
       })
     })
     
+    // Check request success
+    if (!response.ok) {
+        throw new Error(`Server returned ${response.status} ${response.statusText}`)
+    }
+
     const data = await response.json()
     
     // Add bot response
     updateTime()
     messages.value.push({
       id: messages.value.length + 1,
-      text: data.reply || 'Maaf, terjadi kesalahan. Silakan coba lagi.',
+      text: data.response || data.reply || 'Maaf, terjadi kesalahan. Silakan coba lagi.',
       isBot: true,
       timestamp: currentTime.value
     })
@@ -93,7 +98,7 @@ async function sendMessage() {
     updateTime()
     messages.value.push({
       id: messages.value.length + 1,
-      text: `Maaf, koneksi ke server chatbot gagal. Pastikan backend ML berjalan di ${ML_API_URL}`,
+      text: `Maaf, koneksi ke server chatbot gagal. error: ${error.message}`,
       isBot: true,
       timestamp: currentTime.value
     })

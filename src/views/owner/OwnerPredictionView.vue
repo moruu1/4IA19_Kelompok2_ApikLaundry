@@ -224,7 +224,7 @@ const predictionError = ref(null)
 const predictionData = ref(null)
 const historicalData = ref(null)
 const predictionDays = ref(30)
-const ML_API_URL = import.meta.env.VITE_ML_API_URL || 'http://localhost:5000'
+const ML_API_URL = import.meta.env.VITE_ML_API_URL || '/api'
 
 // Inventory Prediction States
 const loadingInventory = ref(false)
