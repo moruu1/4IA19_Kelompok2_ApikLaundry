@@ -75,10 +75,10 @@ try:
             }
         }
         
-except Exception as e:
-    print(f"Import error: {e}")
+except Exception as error:
+    print(f"Import error: {error}")
     def train_and_predict(days=30):
-        return {'success': False, 'error': str(e)}
+        return {'success': False, 'error': str(error)}
 
 
 class handler(BaseHTTPRequestHandler):
@@ -93,7 +93,7 @@ class handler(BaseHTTPRequestHandler):
                 days = int(query_params.get('days', ['30'])[0])
                 if days < 1 or days > 365:
                     raise ValueError("Days must be between 1 and 365")
-            except ValueError as e:
+            except ValueError as val_error:
                 self.send_response(400)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -101,7 +101,7 @@ class handler(BaseHTTPRequestHandler):
                 
                 error_response = {
                     'success': False,
-                    'error': f'Invalid days parameter: {str(e)}'
+                    'error': f'Invalid days parameter: {str(val_error)}'
                 }
                 self.wfile.write(json.dumps(error_response).encode())
                 return
@@ -121,8 +121,8 @@ class handler(BaseHTTPRequestHandler):
             
             self.wfile.write(json.dumps(result).encode())
             
-        except Exception as e:
-            print(f"Error in predict endpoint: {e}")
+        except Exception as error:
+            print(f"Error in predict endpoint: {error}")
             import traceback
             traceback.print_exc()
             
@@ -133,7 +133,7 @@ class handler(BaseHTTPRequestHandler):
             
             error_response = {
                 'success': False,
-                'error': f'Server error: {str(e)}'
+                'error': f'Server error: {str(error)}'
             }
             self.wfile.write(json.dumps(error_response).encode())
     

@@ -37,22 +37,22 @@ try:
                 "total_items": len(result)
             }
             
-        except Exception as e:
-            print(f"Error in inventory prediction: {e}")
+        except Exception as error:
+            print(f"Error in inventory prediction: {error}")
             import traceback
             traceback.print_exc()
             return {
                 "success": False,
-                "error": f"Failed to generate inventory prediction: {str(e)}",
+                "error": f"Failed to generate inventory prediction: {str(error)}",
                 "predictions": []
             }
     
-except Exception as e:
-    print(f"Import error: {e}")
+except Exception as error:
+    print(f"Import error: {error}")
     def get_inventory_prediction():
         return {
             "success": False,
-            "error": f"Server configuration error: {str(e)}",
+            "error": f"Server configuration error: {str(error)}",
             "predictions": []
         }
 
@@ -75,7 +75,7 @@ class handler(BaseHTTPRequestHandler):
             
             self.wfile.write(json.dumps(result).encode())
             
-        except Exception as e:
+        except Exception as error:
             self.send_response(500)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -83,7 +83,7 @@ class handler(BaseHTTPRequestHandler):
             
             error_response = {
                 'success': False,
-                'error': str(e),
+                'error': str(error),
                 'predictions': []
             }
             self.wfile.write(json.dumps(error_response).encode())

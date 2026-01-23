@@ -36,22 +36,22 @@ try:
                 "total_records": len(serialized_data)
             }
             
-        except Exception as e:
-            print(f"Error fetching historical data: {e}")
+        except Exception as error:
+            print(f"Error fetching historical data: {error}")
             import traceback
             traceback.print_exc()
             return {
                 "success": False,
-                "error": f"Failed to fetch historical data: {str(e)}",
+                "error": f"Failed to fetch historical data: {str(error)}",
                 "data": []
             }
     
-except Exception as e:
-    print(f"Import error: {e}")
+except Exception as error:
+    print(f"Import error: {error}")
     def get_historical_data():
         return {
             "success": False,
-            "error": f"Server configuration error: {str(e)}",
+            "error": f"Server configuration error: {str(error)}",
             "data": []
         }
 
@@ -74,7 +74,7 @@ class handler(BaseHTTPRequestHandler):
             
             self.wfile.write(json.dumps(result).encode())
             
-        except Exception as e:
+        except Exception as error:
             self.send_response(500)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -82,7 +82,7 @@ class handler(BaseHTTPRequestHandler):
             
             error_response = {
                 'success': False,
-                'error': str(e),
+                'error': str(error),
                 'data': []
             }
             self.wfile.write(json.dumps(error_response).encode())

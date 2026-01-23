@@ -17,12 +17,12 @@ try:
             # Simple query to test connection
             response = supabase.table('financials').select('id_transaksi').limit(1).execute()
             return True
-        except Exception as e:
-            print(f"Database check failed: {e}")
+        except Exception as error:
+            print(f"Database check failed: {error}")
             return False
     
-except Exception as e:
-    print(f"Import error in health check: {e}")
+except Exception as error:
+    print(f"Import error in health check: {error}")
     def check_database_connection():
         return False
 
@@ -52,7 +52,7 @@ class handler(BaseHTTPRequestHandler):
             
             self.wfile.write(json.dumps(response_data).encode())
             
-        except Exception as e:
+        except Exception as error:
             self.send_response(500)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -60,7 +60,7 @@ class handler(BaseHTTPRequestHandler):
             
             error_response = {
                 'status': 'error',
-                'error': str(e)
+                'error': str(error)
             }
             self.wfile.write(json.dumps(error_response).encode())
     
