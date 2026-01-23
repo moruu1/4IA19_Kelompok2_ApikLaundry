@@ -8,6 +8,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from chatbot import LaundryChatbot
 from predict import train_and_predict
+from fetch_data import get_revenue_data
+from inventory import InventoryPredictor
 
 app = Flask(__name__)
 # Enable CORS for all domains to allow frontend access
@@ -51,6 +53,33 @@ def predict():
         days = int(request.args.get('days', 30))
         result = train_and_predict(days)
         return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/historical', methods=['GET'])
+def historical():
+    try:
+        data = get_revenue_data()
+        if data:
+            # Convert date objects to strings for JSON serialization
+            for item in data:
+                if 'date' in item:
+                    item['date'] = item['date'].isoformat()
+            return jsonify({"success": True, "data": data})
+        return jsonify({"success": False, "data": []})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/inventory-prediction', methods=['GET'])
+def inventory_prediction():
+    try:
+        predictor = InventoryPredictor()
+        result = predictor.get_prediction()
+        # Handle case where result might be an error dict
+        if isinstance(result, dict) and "error" in result:
+             return jsonify({"success": False, "error": result["error"]}), 500
+            
+        return jsonify({"success": True, "predictions": result})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

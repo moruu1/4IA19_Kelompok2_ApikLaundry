@@ -2,12 +2,11 @@ import pandas as pd
 import os
 import json
 from supabase import create_client, Client
-from dotenv import load_dotenv
+from config import SUPABASE_URL, SUPABASE_KEY
 
-# 1. Load Environment Variables
-load_dotenv()
-URL = os.getenv("SUPABASE_URL")
-KEY = os.getenv("SUPABASE_KEY")
+# 1. Load Environment Variables (Handled by config.py)
+URL = SUPABASE_URL
+KEY = SUPABASE_KEY
 
 # Inisialisasi Client Supabase
 supabase: Client = create_client(URL, KEY)
