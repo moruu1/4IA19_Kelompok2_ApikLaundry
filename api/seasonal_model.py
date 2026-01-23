@@ -115,19 +115,22 @@ class SeasonalRevenueModel:
                 # For near-zero days, use absolute error relative to global median as proxy
                 abs_percent_errors.append(abs(err) / self.global_median)
                 
-        # Calculate final metrics
+        # Calculate final metrics with WMAPE (Weighted MAPE) - Better for volatile data
         n = len(sorted_data)
         mae = sum(abs_errors) / n if n > 0 else 0
         rmse = math.sqrt(sum(squared_errors) / n) if n > 0 else 0
         
-        # Robust MAPE
-        mape = (sum(abs_percent_errors) / len(abs_percent_errors) * 100) if abs_percent_errors else 0
+        # WMAPE = (Sum of Absolute Errors) / (Sum of Actuals)
+        # This is much more stable than averaging percentages, especially with low volume days
+        total_actual = sum(d['revenue'] for d in sorted_data)
+        metrics_mape = (sum(abs_errors) / total_actual * 100) if total_actual > 0 else 0
         
         self.metrics = {
             'mae': mae,
             'rmse': rmse,
-            'mape': mape,
-            'r2': 0
+            'mape': metrics_mape, # Actually WMAPE
+            'r2': 0,
+            'version': 'v2.1-Robust Median'
         }
         
         return self.metrics
