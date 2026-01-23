@@ -143,9 +143,9 @@ class InventoryPredictor:
             print("✅ Prediksi selesai.")
             return final_results
 
-        except Exception as e:
-            print(f"❌ Error Inventory: {e}")
-            return {"error": str(e)}
+        except Exception as error:
+            print(f"❌ Error Inventory: {error}")
+            return {"error": str(error)}
 
 # --- BLOCK TEST MANUAL (Bisa dijalankan langsung di terminal) ---
 if __name__ == "__main__":
