@@ -19,39 +19,51 @@ try:
     
     def train_and_predict(days=30):
         """Train model and get predictions"""
-        df = get_revenue_data()
+        df = get_revenue_data() # This now returns list of dicts
         
-        if df is None or len(df) < 10:
+        if df is None or len(df) < 5:
             raise Exception('Insufficient data for training')
         
         model = RevenuePredictionModel()
         metrics = model.train(df)
-        predictions = model.predict_future(days=days)
-        fitted_values = model.get_fitted_values()
+        
+        # model.predict_future returns dict with 'predictions' list
+        future_result = model.predict_future(days=days)
+        predictions_list = future_result['predictions']
+        
+        # model.get_fitted_values returns list of dicts
+        fitted_list = model.get_fitted_values()
+        
         mae = float(metrics['mae'])
         
-        # Format predictions
-        predictions_list = predictions.to_dict('records')
+        # Format predictions (add upper/lower bound)
+        formatted_predictions = []
         for pred in predictions_list:
-            pred['date'] = pred['date'].strftime('%Y-%m-%d')
-            pred['predicted_revenue'] = float(pred['predicted_revenue'])
-            pred['upper_bound'] = float(pred['predicted_revenue'] + mae)
-            pred['lower_bound'] = float(max(0, pred['predicted_revenue'] - mae))
+            # pred['date'] is already isoformat string from model.predict_future
+            val = float(pred['predicted_revenue'])
+            formatted_predictions.append({
+                'date': pred['date'],
+                'predicted_revenue': val,
+                'upper_bound': val + mae,
+                'lower_bound': max(0, val - mae)
+            })
         
         # Format fitted values
-        fitted_list = fitted_values.to_dict('records')
+        formatted_fitted = []
         for fit in fitted_list:
-            fit['date'] = fit['date'].strftime('%Y-%m-%d')
-            fit['actual_revenue'] = float(fit['actual_revenue'])
-            fit['fitted_revenue'] = float(fit['fitted_revenue'])
+            formatted_fitted.append({
+                'date': fit['date'].strftime('%Y-%m-%d'),
+                'actual_revenue': float(fit['actual_revenue']),
+                'fitted_revenue': float(fit['fitted_revenue'])
+            })
         
         return {
             'success': True,
-            'predictions': predictions_list,
-            'fitted_values': fitted_list,
+            'predictions': formatted_predictions,
+            'fitted_values': formatted_fitted,
             'summary': {
-                'total_predicted': float(predictions['predicted_revenue'].sum()),
-                'average_daily': float(predictions['predicted_revenue'].mean()),
+                'total_predicted': float(future_result['total_predicted']),
+                'average_daily': float(future_result['average_daily']),
                 'days': days
             },
             'model_info': {
