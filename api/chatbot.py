@@ -79,7 +79,7 @@ class LaundryChatbot:
 
         except Exception as e:
             print(f"Error Groq: {e}")
-            return "Maaf, sedang ada gangguan pada sistem AI kami. Silakan hubungi via WhatsApp."
+            return f"DEBUG ERROR: {str(e)}" # Temporary debug message
 
 # --- Blok Test Manual ---
 if __name__ == "__main__":
