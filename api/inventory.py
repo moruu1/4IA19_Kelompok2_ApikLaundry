@@ -139,11 +139,11 @@ class InventoryPredictor:
             
             return final_results
 
-        except Exception as e:
+        except Exception as error:
             import traceback
             error_trace = traceback.format_exc()
-            print(f"❌ Inventory Prediction Error: {e}\n{error_trace}")
-            return {"error": f"Inventory prediction failed: {str(e)}"}
+            print(f"❌ Inventory Prediction Error: {error}\n{error_trace}")
+            return {"error": f"Inventory prediction failed: {str(error)}"}
 
 # --- BLOCK TEST MANUAL (Bisa dijalankan langsung di terminal) ---
 if __name__ == "__main__":
