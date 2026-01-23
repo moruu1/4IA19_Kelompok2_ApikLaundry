@@ -21,6 +21,27 @@ class SeasonalRevenueModel:
         # 1. Sort data
         sorted_data = sorted(data, key=lambda x: x['date'])
         
+        # SMART GAP DETECTION 🧠
+        # If there's a gap > 21 days (3 weeks), ignore data before that gap.
+        # This prevents stale history (e.g. Oct 2025) from polluting current trends (Jan 2026)
+        cutoff_index = 0
+        for i in range(1, len(sorted_data)):
+            prev_date = sorted_data[i-1]['date']
+            curr_date = sorted_data[i]['date']
+            delta = (curr_date - prev_date).days
+            
+            if delta > 21: # Found a massive gap (shop closed/inactive)
+                cutoff_index = i
+        
+        if cutoff_index > 0:
+            original_len = len(sorted_data)
+            sorted_data = sorted_data[cutoff_index:]
+            print(f"Stats: Gap detected! Using only recent {len(sorted_data)} records (dropped {cutoff_index} old records).")
+            
+        # If left with too little data (< 5 days), fallback to full history but warn
+        if len(sorted_data) < 5 and len(data) >= 5:
+             sorted_data = sorted(data, key=lambda x: x['date']) # Revert if too aggressive
+        
         # Calculate Global Median (for fallback/smoothing)
         all_revenues = [d['revenue'] for d in sorted_data]
         self.global_median = statistics.median(all_revenues) if all_revenues else 0
