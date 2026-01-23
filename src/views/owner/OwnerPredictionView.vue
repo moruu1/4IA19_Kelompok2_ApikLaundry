@@ -521,21 +521,27 @@ async function fetchPredictions() {
   
   try {
     // Fetch predictions
-    const predictionResponse = await fetch(`${ML_API_URL}/predict?days=${predictionDays.value}`)
+    const predictionResponse = await fetch(`${ML_API_URL}/api/predict?days=${predictionDays.value}`)
     if (!predictionResponse.ok) throw new Error('Gagal mengambil data prediksi')
     
     predictionData.value = await predictionResponse.json()
     
     // Fetch historical data
-    const historicalResponse = await fetch(`${ML_API_URL}/historical`)
+    const historicalResponse = await fetch(`${ML_API_URL}/api/historical`)
     if (!historicalResponse.ok) throw new Error('Gagal mengambil data historis')
     
-    historicalData.value = await historicalResponse.json()
+    const historicalResult = await historicalResponse.json()
+    
+    // Extract data from response - backend returns {success: true, data: [...]}
+    if (historicalResult.success && historicalResult.data) {
+      historicalData.value = { data: historicalResult.data }
+    } else {
+      throw new Error('Data historis tidak tersedia')
+    }
     
   } catch (error) {
     console.error('Error fetching predictions:', error)
-    console.log('ML API URL:', ML_API_URL) // Debug log
-    predictionError.value = error.message || `Tidak dapat terhubung ke server ML (${ML_API_URL}). Pastikan backend ML berjalan dan URL tunnel aktif.`
+    predictionError.value = error.message || `Tidak dapat terhubung ke server prediksi. Silakan coba lagi.`
   } finally {
     loadingPrediction.value = false
     
@@ -584,7 +590,7 @@ async function fetchInventoryPrediction() {
   inventoryError.value = null
   
   try {
-    const response = await fetch(`${ML_API_URL}/inventory-prediction`)
+    const response = await fetch(`${ML_API_URL}/api/inventory-prediction`)
     if (!response.ok) throw new Error('Gagal mengambil data prediksi inventaris')
     
     const result = await response.json()
@@ -597,8 +603,7 @@ async function fetchInventoryPrediction() {
     
   } catch (error) {
     console.error('Error fetching inventory prediction:', error)
-    console.log('ML API URL:', ML_API_URL) // Debug log
-    inventoryError.value = error.message || `Tidak dapat terhubung ke server ML (${ML_API_URL}). Pastikan backend ML berjalan dan URL tunnel aktif.`
+    inventoryError.value = error.message || `Tidak dapat terhubung ke server prediksi. Silakan coba lagi.`
   } finally {
     loadingInventory.value = false
   }

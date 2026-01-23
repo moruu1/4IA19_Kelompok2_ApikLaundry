@@ -57,7 +57,9 @@ def predict():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/historical', methods=['GET'])
+@app.route('/historical', methods=['GET']) # Fallback for proxy stripping
 def historical():
+    print(f"Incoming request: {request.path}")
     try:
         data = get_revenue_data()
         if data:
@@ -68,19 +70,28 @@ def historical():
             return jsonify({"success": True, "data": data})
         return jsonify({"success": False, "data": []})
     except Exception as e:
+        print(f"Error in historical endpoint: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/inventory-prediction', methods=['GET'])
+@app.route('/inventory-prediction', methods=['GET']) # Fallback
 def inventory_prediction():
+    print(f"Incoming request: {request.path}")
     try:
         predictor = InventoryPredictor()
         result = predictor.get_prediction()
         # Handle case where result might be an error dict
         if isinstance(result, dict) and "error" in result:
+             print(f"Inventory prediction returned error: {result['error']}")
              return jsonify({"success": False, "error": result["error"]}), 500
             
         return jsonify({"success": True, "predictions": result})
     except Exception as e:
+        print(f"Error in inventory_prediction endpoint: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 # Handler for Vercel Serverless Function
