@@ -21,22 +21,30 @@ class SeasonalRevenueModel:
         # 1. Sort data
         sorted_data = sorted(data, key=lambda x: x['date'])
         
-        # SMART GAP DETECTION 🧠
-        # If there's a gap > 21 days (3 weeks), ignore data before that gap.
-        # This prevents stale history (e.g. Oct 2025) from polluting current trends (Jan 2026)
-        cutoff_index = 0
-        for i in range(1, len(sorted_data)):
-            prev_date = sorted_data[i-1]['date']
-            curr_date = sorted_data[i]['date']
-            delta = (curr_date - prev_date).days
-            
-            if delta > 21: # Found a massive gap (shop closed/inactive)
-                cutoff_index = i
+        # SMART GAP DETECTION 🧠 (Improved)
+        # We need to find the latest CONTIGUOUS segment of active business.
+        # Step 1: Filter only days with meaningful revenue (> 1000) to check for active gaps
+        # (This ignores days where revenue was 0 but record existed)
+        active_days = [d for d in sorted_data if d['revenue'] > 1000]
         
-        if cutoff_index > 0:
+        cutoff_date = None
+        
+        if len(active_days) > 1:
+            for i in range(1, len(active_days)):
+                prev_date = active_days[i-1]['date']
+                curr_date = active_days[i]['date']
+                delta = (curr_date - prev_date).days
+                
+                # If gap > 21 days between ACTIVE trading days
+                if delta > 21: 
+                    cutoff_date = curr_date
+        
+        # Step 2: Apply cutoff to original data
+        if cutoff_date:
             original_len = len(sorted_data)
-            sorted_data = sorted_data[cutoff_index:]
-            print(f"Stats: Gap detected! Using only recent {len(sorted_data)} records (dropped {cutoff_index} old records).")
+            # Keep only data ON or AFTER the cutoff date
+            sorted_data = [d for d in sorted_data if d['date'] >= cutoff_date]
+            print(f"Stats: Gap detected! Cutoff: {cutoff_date}. Kept {len(sorted_data)} records.")
             
         # If left with too little data (< 5 days), fallback to full history but warn
         if len(sorted_data) < 5 and len(data) >= 5:
