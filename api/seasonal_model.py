@@ -46,6 +46,14 @@ class SeasonalRevenueModel:
             sorted_data = [d for d in sorted_data if d['date'] >= cutoff_date]
             print(f"Stats: Gap detected! Cutoff: {cutoff_date}. Kept {len(sorted_data)} records.")
             
+        # SAFETY NET: HARD LIMIT 🛡️
+        # If we STILL have too much data (e.g. gap detection missed), 
+        # force take only the last 60 transaction days. 
+        # Laundry trends change fast; data > 2 months ago is noise.
+        if len(sorted_data) > 60:
+            print(f"Stats: Trimming old data. Keeping last 60 of {len(sorted_data)} records.")
+            sorted_data = sorted_data[-60:]
+            
         # If left with too little data (< 5 days), fallback to full history but warn
         if len(sorted_data) < 5 and len(data) >= 5:
              sorted_data = sorted(data, key=lambda x: x['date']) # Revert if too aggressive
