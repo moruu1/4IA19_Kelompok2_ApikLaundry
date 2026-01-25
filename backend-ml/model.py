@@ -70,7 +70,8 @@ class RevenuePredictionModel:
         mape = self.calculate_mape(y_test, y_pred)
         
         print("\n" + "="*50)
-        print("Model Training Results:")
+        print("Model Training Results (Linear Regression):")
+        print(f"Features: 4 basic (day_of_week, day_of_month, month, day_number)")
         print(f"Mean Absolute Error: Rp {mae:,.0f}")
         print(f"Root Mean Squared Error: Rp {rmse:,.0f}")
         print(f"R² Score: {r2:.4f}")
@@ -105,16 +106,20 @@ class RevenuePredictionModel:
     
     def predict_future(self, days=30):
         """
-        Predict revenue for the next N days
+        Predict revenue for the next N days starting from the last training data date
         """
         if not self.is_trained:
             raise Exception("Model must be trained first!")
         
-        # Get today's date (only date, no time)
-        today = datetime.now().date()
+        # Get the last date from training data
+        if self.training_df is not None and len(self.training_df) > 0:
+            last_date = pd.to_datetime(self.training_df['date']).max().date()
+        else:
+            # Fallback to today if no training data
+            last_date = datetime.now().date()
         
-        # Generate future dates
-        future_dates = [today + timedelta(days=i) for i in range(1, days+1)]
+        # Generate future dates starting from last_date + 1
+        future_dates = [last_date + timedelta(days=i) for i in range(1, days+1)]
         
         # Prepare features for future dates
         future_df = pd.DataFrame({

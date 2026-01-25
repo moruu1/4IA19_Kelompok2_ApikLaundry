@@ -1,194 +1,206 @@
-import math
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from datetime import datetime, timedelta
 from fetch_data import get_revenue_data
 
-class SimpleLinearRegression:
-    def __init__(self):
-        self.slope = 0
-        self.intercept = 0
-        self.is_trained = False
-        self.training_data = None
-        
-    def fit(self, x_values, y_values):
-        """
-        Fit the model using Least Squares Mean
-        """
-        n = len(x_values)
-        if n < 2:
-            raise ValueError("Insufficient data points")
-            
-        sum_x = sum(x_values)
-        sum_y = sum(y_values)
-        sum_xy = sum(x * y for x, y in zip(x_values, y_values))
-        sum_xx = sum(x * x for x in x_values)
-        
-        # Calculate slope (m) and intercept (c)
-        denominator = n * sum_xx - sum_x * sum_x
-        if denominator == 0:
-            self.slope = 0
-            self.intercept = sum_y / n
-        else:
-            self.slope = (n * sum_xy - sum_x * sum_y) / denominator
-            self.intercept = (sum_y - self.slope * sum_x) / n
-            
-        self.is_trained = True
-        
-    def predict(self, x):
-        if not self.is_trained:
-            raise Exception("Model not trained")
-        
-        # Handle both single value and list
-        if isinstance(x, (list, tuple)):
-            return [self.slope * val + self.intercept for val in x]
-        return self.slope * x + self.intercept
-
 class RevenuePredictionModel:
     def __init__(self):
-        self.model = SimpleLinearRegression()
+        self.model = LinearRegression()
         self.is_trained = False
-        self.training_data = []  
+        self.training_data = None
         self.start_date = None
         
-    def prepare_data(self, data):
+    def prepare_features(self, data):
         """
-        Prepare/Extract features (x=day_number) and target (y=revenue)
+        Prepare features for training/prediction
+        Data format: [{'date': date_obj, 'revenue': float}, ...]
+        Features: day_of_week, day_of_month, month, day_number (sequential)
         """
-        if not data:
-            return [], []
+        if not data or len(data) == 0:
+            return None, None
         
-        # Sort just in case
+        # Sort by date
         sorted_data = sorted(data, key=lambda x: x['date'])
         self.start_date = sorted_data[0]['date']
         
-        x = [] # day number
-        y = [] # revenue
+        X = []
+        y = []
         
         for item in sorted_data:
-            delta = item['date'] - self.start_date
-            x.append(delta.days)
-            y.append(item['revenue'])
+            date = item['date']
+            revenue = item['revenue']
             
-        return x, y
+            # Extract features
+            day_of_week = date.weekday()  # 0=Monday, 6=Sunday
+            day_of_month = date.day
+            month = date.month
+            day_number = (date - self.start_date).days
+            
+            X.append([day_of_week, day_of_month, month, day_number])
+            y.append(revenue)
         
-    def get_fitted_values(self):
+        return np.array(X), np.array(y)
+    
+    def calculate_mape(self, y_true, y_pred):
         """
-        Get fitted values (predictions on training data) for visualization
-        Returns: list of dicts
+        Calculate Mean Absolute Percentage Error (MAPE)
         """
-        if not self.is_trained:
-            raise Exception("Model must be trained first!")
-            
-        x, y = self.prepare_data(self.training_data)
-        predictions = self.model.predict(x)
+        mask = y_true != 0
+        if not np.any(mask):
+            return 0.0
         
-        result = []
-        for i, (day_num, actual, pred) in enumerate(zip(x, y, predictions)):
-            date_val = self.start_date + timedelta(days=day_num)
-            result.append({
-                'date': date_val, # Keep as object, format in predict.py
-                'actual_revenue': actual,
-                'fitted_revenue': max(0, pred)
-            })
-            
-        return result
+        mape = np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
+        return mape
     
     def train(self, data):
         """
-        Train the model
+        Train the model with historical data
+        Data format: [{'date': date_obj, 'revenue': float}, ...]
         """
+        # Store original data
         self.training_data = data
-        x, y = self.prepare_data(data)
         
-        if len(x) < 2:
-            return {'error': 'Insufficient data'}
-            
+        X, y = self.prepare_features(data)
+        
+        if X is None or len(X) < 10:
+            return {'error': 'Insufficient data for training. Need at least 10 days.'}
+        
+        # Split data for validation
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
+        
         # Train model
-        self.model.fit(x, y)
+        self.model.fit(X_train, y_train)
         self.is_trained = True
         
-        # Calculate basic metrics (MAE, RMSE) on training data
-        predictions = self.model.predict(x)
-        errors = [p - actual for p, actual in zip(predictions, y)]
+        # Evaluate on test set
+        y_pred = self.model.predict(X_test)
+        mae = mean_absolute_error(y_test, y_pred)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        r2 = r2_score(y_test, y_pred)
+        mape = self.calculate_mape(y_test, y_pred)
         
-        mae = sum(abs(e) for e in errors) / len(errors)
-        rmse = math.sqrt(sum(e*e for e in errors) / len(errors))
-        
-        # Calculate MAPE (Mean Absolute Percentage Error)
-        # Avoid division by zero
-        mape_sum = 0
-        count = 0
-        for actual, pred in zip(y, predictions):
-            if actual != 0:
-                mape_sum += abs((actual - pred) / actual)
-                count += 1
-        mape = (mape_sum / count * 100) if count > 0 else 0
-        
-        # Calculate R2 (Coefficient of Determination)
-        mean_y = sum(y) / len(y)
-        ss_tot = sum((val - mean_y)**2 for val in y)
-        ss_res = sum(e*e for e in errors)
-        r2 = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
+        print("\n" + "="*50)
+        print("Model Training Results (sklearn LinearRegression):")
+        print(f"Features: 4 basic (day_of_week, day_of_month, month, day_number)")
+        print(f"Training samples: {len(X_train)}, Test samples: {len(X_test)}")
+        print(f"Mean Absolute Error: Rp {mae:,.0f}")
+        print(f"Root Mean Squared Error: Rp {rmse:,.0f}")
+        print(f"R² Score: {r2:.4f}")
+        print(f"MAPE: {mape:.2f}%")
+        print("="*50)
         
         return {
             'mae': mae,
             'rmse': rmse,
             'r2': r2,
-            'mape': mape,
-            'slope': self.model.slope
+            'mape': mape
         }
+    
+    def get_fitted_values(self):
+        """
+        Get fitted values (predictions on training data) for visualization
+        Returns: list of dicts [{'date': date_obj, 'actual_revenue': float, 'fitted_revenue': float}]
+        """
+        if not self.is_trained or self.training_data is None:
+            raise Exception("Model must be trained first!")
+        
+        X, y = self.prepare_features(self.training_data)
+        fitted_values = self.model.predict(X)
+        
+        # Create result list
+        result = []
+        sorted_data = sorted(self.training_data, key=lambda x: x['date'])
+        
+        for i, item in enumerate(sorted_data):
+            result.append({
+                'date': item['date'],  # Keep as date object
+                'actual_revenue': y[i],
+                'fitted_revenue': max(0, fitted_values[i])  # No negative predictions
+            })
+        
+        return result
     
     def predict_future(self, days=30):
         """
-        Predict revenue for the next N days
-        Returns: list of dicts [{'date': date_obj, 'predicted_revenue': float}]
+        Predict revenue for the next N days starting from the last training data date
+        Returns: dict with 'predictions', 'total_predicted', 'average_daily'
         """
         if not self.is_trained:
             raise Exception("Model must be trained first!")
         
-        # Find the last day number from training data
-        x_train, _ = self.prepare_data(self.training_data)
-        last_day_num = x_train[-1] if x_train else 0
+        # Get the last date from training data
+        if self.training_data is not None and len(self.training_data) > 0:
+            sorted_data = sorted(self.training_data, key=lambda x: x['date'])
+            last_date = sorted_data[-1]['date']
+        else:
+            last_date = datetime.now().date()
         
+        # Generate future dates starting from last_date + 1
+        future_dates = [last_date + timedelta(days=i) for i in range(1, days+1)]
+        
+        # Prepare features for future dates
+        X_future = []
+        for date in future_dates:
+            day_of_week = date.weekday()
+            day_of_month = date.day
+            month = date.month
+            day_number = (date - self.start_date).days
+            
+            X_future.append([day_of_week, day_of_month, month, day_number])
+        
+        X_future = np.array(X_future)
+        
+        # Predict
+        predictions = self.model.predict(X_future)
+        
+        # Ensure no negative predictions
+        predictions = np.maximum(predictions, 0)
+        
+        # Create result
         future_predictions = []
-        
-        # Predict for next 'days' days
-        for i in range(1, days + 1):
-            future_day_num = last_day_num + i
-            pred_revenue = self.model.predict(future_day_num)
-            
-            # Ensure no negative predictions
-            pred_revenue = max(0, pred_revenue)
-            
-            future_date = self.start_date + timedelta(days=future_day_num)
-            
+        for i, date in enumerate(future_dates):
             future_predictions.append({
-                'date': future_date.isoformat(), # Return string for JSON serialization
-                'predicted_revenue': pred_revenue
+                'date': date.isoformat(),  # ISO format for JSON serialization
+                'predicted_revenue': float(predictions[i])
             })
-            
+        
+        total_predicted = float(np.sum(predictions))
+        average_daily = total_predicted / days if days > 0 else 0
+        
         return {
             'predictions': future_predictions,
-            'total_predicted': sum(p['predicted_revenue'] for p in future_predictions),
-            'average_daily': sum(p['predicted_revenue'] for p in future_predictions) / days
+            'total_predicted': total_predicted,
+            'average_daily': average_daily
         }
 
 def main():
     """
     Main function to train and test the model
     """
-    print("Revenue Prediction Model Training (Lightweight)\n")
+    print("Revenue Prediction Model Training (sklearn LinearRegression)\n")
     
-    # Fetch data
+    # Fetch data from Supabase
     print("Fetching data from Supabase...")
     data = get_revenue_data()
     
-    if not data or len(data) < 5:
-        print("Insufficient data for training. Need at least 5 days of data.")
+    if data is None or len(data) < 10:
+        print("Insufficient data for training. Need at least 10 days of data.")
         return
+    
+    print(f"Loaded {len(data)} days of revenue data")
+    print(f"Date range: {data[0]['date']} to {data[-1]['date']}")
     
     # Initialize and train model
     model = RevenuePredictionModel()
     metrics = model.train(data)
+    
+    if 'error' in metrics:
+        print(f"Error: {metrics['error']}")
+        return
     
     # Predict next 30 days
     print("\nPredicting revenue for next 30 days...")
@@ -197,11 +209,12 @@ def main():
     predictions = result['predictions']
     print("\nPredicted Revenue (Next 5 Days):")
     for p in predictions[:5]:
-        print(f"Date: {p['date']}, Revenue: Rp {p['predicted_revenue']:,.0f}")
-        
+        print(f"  {p['date']}: Rp {p['predicted_revenue']:,.0f}")
+    
     print(f"\nTotal predicted revenue (30 days): Rp {result['total_predicted']:,.0f}")
+    print(f"Average predicted daily revenue: Rp {result['average_daily']:,.0f}")
     
     return model, result
 
 if __name__ == "__main__":
-    main()
+    model, predictions = main()

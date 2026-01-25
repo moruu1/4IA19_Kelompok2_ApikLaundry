@@ -9,7 +9,7 @@ import os
 
 app = Flask(__name__)
 # Enable CORS for all origins (needed for ngrok)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Cache model in memory with timestamp
 model_cache = {

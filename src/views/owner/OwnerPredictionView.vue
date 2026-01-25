@@ -463,19 +463,8 @@ function renderChart() {
         x: {
           grid: {
             display: true,
-            color: (context) => {
-              // Highlight boundary between actual and prediction
-              if (context.index === historical.length) {
-                return 'rgba(255, 152, 0, 0.3)'
-              }
-              return 'rgba(0, 0, 0, 0.05)'
-            },
-            lineWidth: (context) => {
-              if (context.index === historical.length) {
-                return 2
-              }
-              return 1
-            }
+            color: 'rgba(0, 0, 0, 0.05)',
+            lineWidth: 1
           },
           ticks: {
             font: {
@@ -528,7 +517,7 @@ async function fetchPredictions(retryCount = 0) {
     const predictionTimeout = setTimeout(() => predictionController.abort(), 10000) // 10s timeout
     
     const predictionResponse = await fetch(
-      `${ML_API_URL}/predict?days=${predictionDays.value}`,
+      `${ML_API_URL}/api/predict?days=${predictionDays.value}`,
       { signal: predictionController.signal }
     )
     clearTimeout(predictionTimeout)
@@ -551,7 +540,7 @@ async function fetchPredictions(retryCount = 0) {
     const historicalTimeout = setTimeout(() => historicalController.abort(), 10000)
     
     const historicalResponse = await fetch(
-      `${ML_API_URL}/historical`,
+      `${ML_API_URL}/api/historical`,
       { signal: historicalController.signal }
     )
     clearTimeout(historicalTimeout)
@@ -651,7 +640,7 @@ async function fetchInventoryPrediction(retryCount = 0) {
     const timeout = setTimeout(() => controller.abort(), 10000) // 10s timeout
     
     const response = await fetch(
-      `${ML_API_URL}/inventory-prediction`,
+      `${ML_API_URL}/api/inventory-prediction`,
       { signal: controller.signal }
     )
     clearTimeout(timeout)

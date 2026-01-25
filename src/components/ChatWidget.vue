@@ -67,7 +67,7 @@ async function sendMessage() {
   
   try {
     // Call backend chatbot API
-    const response = await fetch(`${ML_API_URL}/chat`, {
+    const response = await fetch(`${ML_API_URL}/api/chatbot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -11,22 +11,25 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 try:
     from flask import Flask
     from flask_cors import CORS
-    from seasonal_model import SeasonalRevenueModel
+    from model import RevenuePredictionModel  # Changed from seasonal_model to model
     from fetch_data import get_revenue_data
     
     app = Flask(__name__)
     CORS(app)
     
     def train_and_predict(days=30):
-        """Train model and get predictions using Seasonal Model"""
+        """Train model and get predictions using Linear Regression"""
         df = get_revenue_data() # Returns list of dicts
         
         if df is None or len(df) < 5:
             raise Exception('Insufficient data for training')
         
-        # Initialize and train Seasonal Model
-        model = SeasonalRevenueModel()
+        # Initialize and train Linear Regression Model
+        model = RevenuePredictionModel()
         metrics = model.train(df)
+        
+        if 'error' in metrics:
+            raise Exception(metrics['error'])
         
         # Get future predictions
         future_result = model.predict_future(days=days)
@@ -71,11 +74,12 @@ try:
                 'trained_with_data_size': len(df),
                 'mae': float(metrics['mae']),
                 'rmse': float(metrics['rmse']),
-                'r2': 0, # Not applicable for this custom model
+                'r2': float(metrics['r2']),
                 'mape': float(metrics['mape']),
-                'algorithm': 'Seasonal Adaptive (DSMA)'
+                'algorithm': 'Linear Regression (sklearn)'
             }
         }
+        
         
 except Exception as error:
     print(f"Import error: {error}")
