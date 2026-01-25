@@ -1,356 +1,204 @@
-# 🧺 Apik Laundry - Sistem Manajemen Laundry Berbasis Web
+# 🧺 Apik Laundry - Sistem Manajemen Laundry
 
-**Tugas Kelompok 2 - Kelas 4IA19**  
-**Universitas Gunadarma**  
-**Mata Kuliah: RPL 2 dan PPPL**
-**Tahun Akademik: 2025/2026**
+![Project Status](https://img.shields.io/badge/Status-Production%20Ready-success)
+![Frontend](https://img.shields.io/badge/Frontend-Vue.js%203-4FC08D)
+![Backend](https://img.shields.io/badge/Backend-Supabase-3ECF8E)
+![ML](https://img.shields.io/badge/ML-Python%20Flask-3776AB)
 
----
+## 📋 Overview
 
-## 👥 Anggota Kelompok 2
+**Apik Laundry** adalah sistem manajemen laundry berbasis web dengan fitur Machine Learning untuk prediksi pendapatan & inventory, dilengkapi AI chatbot untuk customer service otomatis.
 
-| No | NPM | Nama | Role | GitHub |
-|----|-----|------|------|--------|
-| 1  | 51422153 | Muhammad Ryan Firmansyah | Project Manager | @muhammadryanfirmansyah28-gif(https://github.com/muhammadryanfirmansyah28-gif) |
-| 2  | 50422887 | Mochamad Girvan Azhar | Full Stack Developer | @girvanazharXD(https://github.com/girvanazharXD) |
-| 3  | 50422380 | Daniel Alvin Trianto | QA | @Fortunatoo(https://github.com/Fortunatoo) |
-| 4  | 50422919 | Moryska Kusuma Dewi | Technical Writer | @moruu1(https://github.com/moruu1) |
-| 5  | 51422669 | Zahra Putri Fajrina | UI/UX Designer | @zahrafajrina02(https://github.com/zahrafajrina02) |
+### ✨ Key Features
 
----
+- 🔐 **Multi-Role System**: Customer, Admin, Owner dengan akses berbeda
+- 📊 **Real-time Dashboard**: Statistik dan analytics live
+- 🤖 **AI Chatbot**: TF-IDF + Cosine Similarity untuk FAQ otomatis
+- 📈 **ML Predictions**: Revenue forecasting (Linear Regression) & Inventory (Moving Average)
+- 📱 **Mobile Responsive**: Optimized untuk semua device
+- 💰 **Financial Reports**: Tracking pemasukan/pengeluaran dengan filtering
 
-## 📖 Tentang Project
+## 🚀 Tech Stack
 
-Apik Laundry adalah sistem manajemen laundry berbasis web yang dilengkapi dengan:
-- ✨ Machine Learning untuk prediksi revenue
-- 🤖 AI Chatbot untuk customer service
-- 📊 Dashboard analytics real-time
-- 📦 Inventory management system
-- 💰 Financial tracking & reporting
+### Frontend
+- **Vue.js 3** - Progressive framework
+- **Pinia** - State management
+- **Vue Router** - Navigation dengan guards
+- **TailwindCSS** - Styling
+- **Chart.js** - Data visualization
+- **Vite** - Build tool
 
-Project ini dibuat dengan fokus pada implementasi teknologi modern seperti Vue.js, Flask, Machine Learning, dan cloud services.
+### Backend
+- **Supabase** - PostgreSQL database + Auth
+- **Python Flask** - ML API server
+- **scikit-learn** - Machine learning models
+- **Pandas/NumPy** - Data processing
 
----
-
-## 🎯 Tujuan Project
-
-1. **Pembelajaran Fullstack Development**
-   - Frontend: Vue.js 3 + Vite
-   - Backend: Python Flask + RESTful API
-   - Database: Supabase (PostgreSQL)
-
-2. **Implementasi Machine Learning**
-   - Predictive analytics untuk revenue forecasting
-   - Time series analysis
-   - scikit-learn integration
-
-3. **Cloud Integration**
-   - Deployment ke Vercel/Netlify
-   - Database cloud dengan Supabase
-   - API integration
-
----
-
-## 🏗️ Struktur Project
+## 📁 Project Structure
 
 ```
-4IA19_Kelompok2_ApikLaundry/
-├── api/                    # Backend API (Flask + ML)
-│   ├── README.md          # API Documentation
-│   ├── model.py           # Linear Regression model
-│   ├── predict.py         # Prediction endpoint
-│   ├── chatbot.py         # AI Chatbot
-│   ├── requirements.txt   # Python dependencies
-│   └── vercel.json        # Vercel deployment config
-│
-├── backend-ml/            # Alternative Backend
-│   ├── app.py            # Main Flask app
-│   └── model.py          # ML model
-│
-├── src/                   # Frontend (Vue.js)
-│   ├── components/       # Reusable Vue components
-│   ├── views/           # Page views (Owner/Kasir)
-│   │   ├── owner/       # Owner dashboard
-│   │   └── kasir/       # Cashier interface
-│   ├── router/          # Vue Router configuration
-│   └── assets/          # Static assets & CSS
-│
-├── public/               # Public static files
-├── .env                  # Environment variables (not in repo)
-├── package.json         # Node.js dependencies
-└── README.md           # This file
+Project Laundry/
+├── backend-ml/              # Python Flask ML API
+│   ├── app.py              # API endpoints
+│   ├── model.py            # Revenue prediction
+│   ├── inventory.py        # Inventory forecasting
+│   ├── chatbot.py          # AI Chatbot engine
+│   └── requirements.txt
+├── src/
+│   ├── components/          # Reusable Vue components
+│   ├── stores/             # Pinia stores (7 stores)
+│   ├── views/              # Page components
+│   │   ├── admin/          # Admin pages (CRUD operations)
+│   │   ├── owner/          # Owner pages (Analytics & Predictions)
+│   │   └── customer/       # Customer pages (Orders & Tracking)
+│   └── router/             # Vue Router config
+└── README.md
 ```
 
----
-
-## 🚀 Quick Start Guide
+## 🛠️ Installation
 
 ### Prerequisites
-- **Node.js** 18+ and npm
-- **Python** 3.9+
-- **Git**
-- Code editor (VS Code recommended)
+- Node.js 18+
+- Python 3.11+
+- Supabase Account (free tier)
 
-### 1. Clone Repository
+### Quick Start
+
+**1. Clone Repository**
 ```bash
 git clone https://github.com/moruu1/4IA19_Kelompok2_ApikLaundry.git
-cd 4IA19_Kelompok2_ApikLaundry
+cd "4IA19_Kelompok2_ApikLaundry"
 ```
 
-### 2. Setup Frontend
+**2. Frontend Setup**
 ```bash
-# Install dependencies
 npm install
+cp .env.example .env
+# Edit .env dengan Supabase credentials
 
-# Run development server
 npm run dev
+# App running at http://localhost:5173
 ```
-Frontend akan berjalan di `http://localhost:5173`
 
-### 3. Setup Backend API
+**3. Backend ML Setup**
 ```bash
-# Navigate to api folder
-cd api
-
-# Install Python dependencies
+cd backend-ml
 pip install -r requirements.txt
+cp .env.example .env
+# Edit .env dengan Supabase credentials
 
-# Create .env file
-copy .env.example .env
-# Edit .env dengan credentials Anda
-
-# Run API server
-python index.py
-```
-API akan berjalan di `http://127.0.0.1:5000`
-
----
-
-## 📦 Tech Stack
-
-### Frontend
-- **Vue.js 3** - Progressive JavaScript framework
-- **Vue Router** - Official routing library
-- **Vite** - Next generation build tool
-- **Chart.js** - Data visualization library
-- **Axios** - HTTP client untuk API calls
-
-### Backend
-- **Flask 3.0** - Micro web framework (Python)
-- **scikit-learn 1.3.2** - Machine Learning library
-- **NumPy & Pandas** - Data processing
-- **Flask-CORS** - Cross-Origin Resource Sharing
-
-### Database & Services
-- **Supabase** - Backend as a Service (PostgreSQL)
-- **Groq AI** - LLaMA model untuk chatbot
-- **Vercel** - Deployment platform
-
-### Machine Learning
-- **Algorithm:** Linear Regression
-- **Library:** scikit-learn
-- **Features:** 4 time-based features
-- **Performance:** MAPE ~46%
-
----
-
-## 🌟 Fitur Utama
-
-### 1. Dashboard Owner 👨‍💼
-- Revenue analytics & predictions
-- Inventory management
-- Financial reports
-- User management
-- Machine Learning insights
-
-### 2. Dashboard Kasir 💼
-- Transaction processing
-- Customer management
-- Quick access tools
-- Daily reports
-
-### 3. Revenue Prediction 📈
-- ML-based revenue forecasting
-- 7-365 days prediction range
-- Accuracy metrics (MAPE, MAE, R²)
-- Visual chart representation
-
-### 4. Inventory Management 📦
-- Real-time stock tracking
-- Auto-depletion prediction
-- Reorder alerts
-- Usage analytics
-
-### 5. AI Chatbot 🤖
-- 24/7 customer support
-- Natural language processing
-- FAQ integration
-- Groq LLaMA powered
-
-### 6. Financial Tracking 💰
-- Income & expense monitoring
-- Daily/monthly reports
-- Category breakdown
----
-
-## 🔐 Environment Variables
-
-### Root `.env` (Frontend)
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_KEY=your-supabase-anon-key
-VITE_ML_API_URL=http://127.0.0.1:5000
+python app.py
+# API running at http://localhost:5000
 ```
 
-### `api/.env` (Backend)
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-supabase-service-key
-GROQ_API_KEY=your-groq-api-key
+**4. Database Setup**
+- Login ke [Supabase Dashboard](https://supabase.com)
+- Create new project
+- Buka **SQL Editor** → New Query
+- Buat tables sesuai schema (lihat section Database Schema di bawah)
+- Disable RLS untuk development (Table Editor → Settings → RLS: OFF)
+- Copy Project URL & Anon Key ke kedua `.env` files
+
+## 👥 User Roles
+
+### Customer (`/customer/*`)
+- View order history & status tracking
+- Browse services catalog
+- AI chatbot untuk FAQ
+- Profile management
+
+### Admin (`/admin/*`)
+- Dashboard dengan statistik real-time
+- CRUD: Orders, Customers, Services, Inventory
+- Financial reports dengan filtering
+- Low stock alerts
+
+### Owner (`/owner/*`)
+- Business analytics dashboard
+- Revenue & inventory predictions (ML)
+- Comprehensive reports
+- Monitoring semua operasi
+
+## 🤖 Machine Learning Features
+
+### 1. Revenue Prediction
+- **Algorithm**: Linear Regression
+- **Input**: 256 hari historical transactions
+- **Output**: 30 hari forecast dengan confidence interval (±MAE/MAPE)
+- **Visualization**: Interactive line chart
+
+### 2. Inventory Forecasting
+- **Algorithm**: Moving Average (7-day window)
+- **Output**: Estimasi hari hingga stok habis
+- **Alerts**: Warning (<7 hari), Urgent (<3 hari)
+
+### 3. AI Chatbot (Tanya Apik)
+- **Method**: TF-IDF + Cosine Similarity
+- **Threshold**: 0.55 untuk relevancy check
+- **Data**: FAQ database dari Supabase (real-time sync)
+
+## 🗄️ Database Schema
+
+**8 Main Tables:**
+
+1. **users** - User profiles dengan roles (admin/owner/customer)
+2. **customers** - Database pelanggan laundry  
+3. **services** - Layanan laundry dengan pricing
+4. **transactions** - Order/transaksi dengan relasi ke customers & services
+5. **financials** - Tracking pemasukan/pengeluaran
+6. **inventory_items** - Manajemen stok barang
+7. **service_bom** - Bill of Materials (relasi service → inventory)
+8. **faq** - Knowledge base untuk AI chatbot
+
+**Catatan**: Schema SQL detail tersedia di Supabase Dashboard → SQL Editor atau hubungi developer team.
+
+## 📊 Key Features Detail
+
+### Admin Dashboard
+- **4 KPI Cards**: Total Customers, Orders Today, Revenue Today, Low Stock Items
+- **Revenue Chart**: Monthly bar chart
+- **Recent Transactions**: Last 5 orders
+- **Low Stock Alerts**: Items with stock ≤ 10
+
+### Owner Prediction Page
+- **Revenue Forecast**: 30-day prediction dengan accuracy metrics (MAE, RMSE, R², MAPE)
+- **Inventory Predictions**: Auto-calculate restock dates
+- **Interactive Charts**: Hover untuk detail data
+- **Confidence Intervals**: Visual range untuk uncertainty
+
+### Mobile Optimization
+- Bottom navigation (70px fixed)
+- Touch-friendly buttons (48px min height)
+- Horizontal scroll tables
+- No horizontal overflow
+- Font sizes optimized (16px inputs - anti zoom)
+
+## 📝 API Endpoints (Flask)
+
+```
+GET  /api/health                - Health check
+GET  /api/train                 - Train ML model
+GET  /api/predict               - Revenue forecast
+GET  /api/historical            - Get historical data
+GET  /api/inventory-prediction  - Inventory forecast
+POST /api/chatbot               - Chat conversation
+GET  /api/chatbot/reload        - Reload FAQ
 ```
 
-Lihat file `.env.example` untuk template lengkap.
-
----
-
-## 🌐 Deployment
-
-### Frontend (Vercel)
-```bash
-npm run build
-vercel --prod
-```
-
-### Backend API (Vercel)
-```bash
-cd api
-vercel --prod
-```
-
-Dokumentasi lengkap deployment: [api/README.md](api/README.md)
-
----
-
-## 📚 Dokumentasi Lengkap
-
-- **API Documentation:** [api/README.md](api/README.md)
-- **Model Documentation:** [api/model.py](api/model.py)
-- **Frontend Components:** [src/components/](src/components/)
-
----
-
-## 🧪 Testing
-
-### Frontend
-```bash
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### Backend
-```bash
-cd api
-
-# Test model
-python model.py
-
-# Run API server
-python index.py
-```
-
-### Manual API Testing
-```bash
-# Health check
-curl http://127.0.0.1:5000/api/health
-
-# Prediction
-curl "http://127.0.0.1:5000/api/predict?days=7"
-
-# Historical data
-curl http://127.0.0.1:5000/api/historical
-```
-
----
-
-## 📸 Screenshots
-
-### Dashboard Owner
-![Owner](docs/screenshots/predict.png)
-*Analytics ML predictions untuk owner*
-
-### Inventory Management
-![Inventory Management](docs/screenshots/inventaris.png)
-*Real-time stock tracking dengan auto-depletion alerts*
-
-### AI Chatbot
-![AI Chatbot](docs/screenshots/chatbot.png)
-*AI-powered customer service chatbot*
-
-### Dashboard Admin
-![Dashboard Admin](docs/screenshots/dashboard-admin.png)
-*Interface admin untuk transaction processing*
-
-### Financial Reports
-![Financial Reports](docs/screenshots/keuangan.png)
-*Comprehensive financial tracking & reporting*
-
----
-
-## 🐛 Known Issues & Future Improvements
-
-### Current Issues
-- [ ] Prediction accuracy bisa ditingkatkan dengan more features
-- [ ] Chatbot masih perlu training lebih lanjut
-
-### Future Enhancements
-- [ ] Mobile app (React Native / Flutter)
-- [ ] WhatsApp integration untuk notifications
-- [ ] Advanced ML models (LSTM, Prophet)
-- [ ] Multi-branch support
-- [ ] Accounting integration
-
----
-
-## 📞 Contact & Support
+## 👨‍💻 Development Team
 
 **Kelompok 2 - 4IA19**
-
-Untuk pertanyaan atau issues terkait project: Silahkan Create GitHub Issue
-
----
+- Project: PPPL
+- Repository: [GitHub](https://github.com/moruu1/4IA19_Kelompok2_ApikLaundry)
 
 ## 📄 License
 
-Project ini dibuat untuk keperluan akademik Universitas Gunadarma.
+Private - Academic Project
 
-**Copyright © 2026 Kelompok 2 - 4IA19**  
-All rights reserved.
+## 📞 Support
 
----
-
-## 🙏 Acknowledgments
-
-- **Open Source Community** - Vue.js, Flask, scikit-learn
-- **Supabase & Groq** - Free tier services
+Untuk pertanyaan atau issue, silakan buka GitHub Issues.
 
 ---
 
-## 📊 Project Statistics
-
-- **Total Commits:** [Auto-update]
-- **Contributors:** 5 students
-- **Lines of Code:** ~10,000+
-- **Technologies Used:** 15+
-
----
-
-**Repository:** https://github.com/moruu1/4IA19_Kelompok2_ApikLaundry  
-**Last Updated:** 2026-01-26  
-**Status:** ✅ Ready for Submission
-
----
-
-> *"Built with ❤️ by Kelompok 2 - 4IA19 Universitas Gunadarma"*
+**Last Updated**: Januari 22, 2026
