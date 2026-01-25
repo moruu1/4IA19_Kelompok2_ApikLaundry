@@ -32,7 +32,7 @@ Project ini dibuat dengan fokus pada implementasi teknologi modern seperti Vue.j
 
 ---
 
-## � Tujuan Project
+## 🎯 Tujuan Project
 
 1. **Pembelajaran Fullstack Development**
    - Frontend: Vue.js 3 + Vite
@@ -154,7 +154,7 @@ API akan berjalan di `http://127.0.0.1:5000`
 
 ---
 
-## � Fitur Utama
+## 🌟 Fitur Utama
 
 ### 1. Dashboard Owner 👨‍💼
 - Revenue analytics & predictions
@@ -191,11 +191,9 @@ API akan berjalan di `http://127.0.0.1:5000`
 - Income & expense monitoring
 - Daily/monthly reports
 - Category breakdown
-- Export to PDF/Excel
-
 ---
 
-## � Environment Variables
+## 🔐 Environment Variables
 
 ### Root `.env` (Frontend)
 ```env
@@ -279,7 +277,27 @@ curl http://127.0.0.1:5000/api/historical
 
 ## 📸 Screenshots
 
-> **Note:** Tambahkan screenshots aplikasi di sini (Dashboard, Prediction, Chatbot, dll)
+### Dashboard Owner
+![Owner](docs/screenshots/predict.png)
+*Analytics ML predictions untuk owner*
+
+### Inventory Management
+![Inventory Management](docs/screenshots/inventaris.png)
+*Real-time stock tracking dengan auto-depletion alerts*
+
+### AI Chatbot
+![AI Chatbot](docs/screenshots/chatbot.png)
+*AI-powered customer service chatbot*
+
+### Dashboard Admin
+![Dashboard Admin](docs/screenshots/dashboard-admin.png)
+*Interface admin untuk transaction processing*
+
+### Financial Reports
+![Financial Reports](docs/screenshots/keuangan.png)
+*Comprehensive financial tracking & reporting*
+
+---
 
 ## 🐛 Known Issues & Future Improvements
 
@@ -304,7 +322,7 @@ Untuk pertanyaan atau issues terkait project: Silahkan Create GitHub Issue
 
 ---
 
-## � License
+## 📄 License
 
 Project ini dibuat untuk keperluan akademik Universitas Gunadarma.
 
@@ -313,7 +331,7 @@ All rights reserved.
 
 ---
 
-## � Acknowledgments
+## 🙏 Acknowledgments
 
 - **Open Source Community** - Vue.js, Flask, scikit-learn
 - **Supabase & Groq** - Free tier services
