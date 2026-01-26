@@ -1,6 +1,6 @@
 # Lightweight ML dependencies
 # Gunakan numpy versi lama yang lebih kecil & compatible
-numpy==1.24.3
+numpy==1.26.4
 scikit-learn==1.3.2
 # HAPUS PANDAS karena size besar (>100MB) dan tidak dipakai di model.py (sudah pakai list/numpy)
 
