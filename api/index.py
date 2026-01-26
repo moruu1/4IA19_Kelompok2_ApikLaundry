@@ -12,8 +12,8 @@ from fetch_data import get_revenue_data
 from inventory import InventoryPredictor
 
 app = Flask(__name__)
-# Enable CORS for all domains to allow frontend access
-CORS(app)
+# Enable CORS for all domains to allow frontend access (Explicitly set resources)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Initialize Chatbot global variable
 chatbot = None
@@ -32,7 +32,7 @@ def get_chatbot():
 def health():
     return jsonify({"status": "ok", "message": "API is running correctly"})
 
-@app.route('/api/chat', methods=['POST'])
+@app.route('/api/chatbot', methods=['POST'])
 def chat():
     bot = get_chatbot()
     if not bot:
